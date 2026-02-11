@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="style.css" rel="stylesheet">
+    <!-- Добавляем Font Awesome для иконок управления музыкой -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <canvas id="grid"></canvas>
+    <div class="gradient"></div>
+    
+    <!-- Аудио плеер -->
+    <div class="music-player">
+        <div class="music-info" id="musicInfo">
+            <span id="musicTitle">Loading music...</span>
+        </div>
+        <div class="music-controls">
+            <button id="playPauseBtn" class="music-btn">
+                <i class="fas fa-pause"></i>
+            </button>
+            <button id="volumeBtn" class="music-btn">
+                <i class="fas fa-volume-up"></i>
+            </button>
+        </div>
+        <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.01" value="0.3">
+        <audio id="bgMusic" loop preload="auto">
+            <source src="YOUR_MUSIC_URL_HERE.mp3" type="audio/mpeg">
+            <!-- Замените YOUR_MUSIC_URL_HERE.mp3 на ссылку на вашу музыку -->
+        </audio>
+    </div>
+    
+    <div class="centertext">
+        <span class="text_1">Z</span>
+        <span class="text_1" style="color:white;">City</span>
+        <div style="margin-top: -2vh;">
+            <span class="info" id="info" style="font-weight: 500;">There is nothing for you... sorry :3</span>
+            <br>
+            <span class="info" id="map"></span>
+            <br>
+            
+            <!-- Прогресс загрузки -->
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <span class="progress-text" id="progressText">0%</span>
+            </div>
+            
+            <span id="text_tips" tip>Hey where tips?</span>
+        </div>
+    </div>
+    
+    <span class="info-down">zcity-help.ru</span>
+    
+    <!-- Анимация загрузки -->
+    <div class="loading-animation">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+    </div>
+
+    <script>
+        // ================ GRID CANVAS ================
+        const canvas = document.getElementById('grid');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth + 25;
+        canvas.height = window.innerHeight + 25;
+        canvas.position = "absolute"
+        
+        const gridSize = 60;
+        let offsetX = window.innerWidth;
+        let offsetY = -window.innerHeight;
+        const gridColor = 'rgba(99, 88, 104, 0.05)';
+        
+        function drawGrid() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let x = offsetX % gridSize; x < canvas.width + gridSize; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.strokeStyle = gridColor;
+                ctx.lineWidth = 2.5;
+                ctx.stroke();
+            }
+
+            for (let y = offsetY % gridSize; y < canvas.height + gridSize; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.strokeStyle = gridColor;
+                ctx.lineWidth = 2.5;
+                ctx.stroke();
+            }
+
+            offsetX -= Math.min(Math.max(Math.sin(Date.now() / 10000), -0.2), 0.2);
+            offsetY += 0.2;
+
+            requestAnimationFrame(drawGrid);
+        }
+
+        drawGrid();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // ================ MUSIC PLAYER ================
+        const audio = document.getElementById('bgMusic');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const volumeBtn = document.getElementById('volumeBtn');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const musicTitle = document.getElementById('musicTitle');
+        
+        // URL твоей музыки - ЗАМЕНИ ЭТО!
+        const MUSIC_URL = 'https://example.com/your-music.mp3'; // Вставь сюда ссылку на MP3
+        
+        // Устанавливаем источник музыки
+        audio.src = MUSIC_URL;
+        
+        // Автоматически пытаемся воспроизвести музыку
+        document.addEventListener('click', function initAudio() {
+            audio.play().catch(e => console.log('Auto-play prevented:', e));
+            document.removeEventListener('click', initAudio);
+        });
+        
+        // Пытаемся воспроизвести сразу
+        audio.play().catch(e => {
+            console.log('Click anywhere to play music');
+            musicTitle.textContent = 'Click anywhere to play music';
+        });
+        
+        // Обработчики кнопок
+        playPauseBtn.addEventListener('click', function() {
+            if (audio.paused) {
+                audio.play();
+                playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                musicTitle.textContent = 'Now playing';
+            } else {
+                audio.pause();
+                playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                musicTitle.textContent = 'Paused';
+            }
+        });
+        
+        volumeSlider.addEventListener('input', function() {
+            audio.volume = this.value;
+            updateVolumeIcon();
+        });
+        
+        volumeBtn.addEventListener('click', function() {
+            if (audio.muted) {
+                audio.muted = false;
+                volumeSlider.value = audio.volume;
+            } else {
+                audio.muted = true;
+                volumeSlider.value = 0;
+            }
+            updateVolumeIcon();
+        });
+        
+        function updateVolumeIcon() {
+            const volumeIcon = volumeBtn.querySelector('i');
+            if (audio.muted || audio.volume === 0) {
+                volumeIcon.className = 'fas fa-volume-mute';
+            } else if (audio.volume < 0.5) {
+                volumeIcon.className = 'fas fa-volume-down';
+            } else {
+                volumeIcon.className = 'fas fa-volume-up';
+            }
+        }
+        
+        // Показываем название трека если есть метаданные
+        audio.addEventListener('loadedmetadata', function() {
+            musicTitle.textContent = audio.src.split('/').pop() || 'Loading music';
+        });
+        
+        audio.addEventListener('play', function() {
+            playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            musicTitle.textContent = 'Now playing';
+        });
+        
+        audio.addEventListener('pause', function() {
+            playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+        });
+
+        // ================ PROGRESS BAR ================
+        let loadingProgress = 0;
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        
+        // Функция обновления прогресса
+        function updateProgress(progress) {
+            loadingProgress = Math.min(progress, 100);
+            progressFill.style.width = loadingProgress + '%';
+            progressText.textContent = Math.round(loadingProgress) + '%';
+            
+            if (loadingProgress >= 100) {
+                setTimeout(() => {
+                    document.querySelector('.progress-container').style.opacity = '0';
+                }, 500);
+            }
+        }
+        
+        // Получаем прогресс от Garry's Mod
+        window.addEventListener('message', function(event) {
+            if (event.data.type === 'progress') {
+                updateProgress(event.data.progress);
+            } else if (event.data.type === 'status') {
+                document.getElementById('info').textContent = event.data.text;
+            }
+        });
+        
+        // Имитация прогресса для тестирования
+        let mockProgress = 0;
+        setInterval(() => {
+            if (mockProgress < 90) {
+                mockProgress += 1;
+                updateProgress(mockProgress);
+            }
+        }, 300);
+
+        // ================ TIPS SYSTEM ================
+        var currentLang = navigator.language;
+        var tipsData = [];
+        var currentTipIndex = 0;
+        
+        function SelectTip() {
+            const newLang = (currentLang === 'ru-RU' || currentLang === 'ru') ? 'ru' : 'en';
+            
+            fetch(`tips/${newLang}.json`)
+                .then(response => response.json())
+                .then(translationData => {
+                    tipsData = Object.values(translationData);
+                    showNextTip();
+                })
+                .catch(error => {
+                    console.error('Error loading language file:', error);
+                    document.querySelector('[tip]').textContent = 'Join our Discord for tips!';
+                });
+        }
+        
+        function showNextTip() {
+            const tipElement = document.querySelector('[tip]');
+            if (tipsData.length > 0) {
+                currentTipIndex = (currentTipIndex + 1) % tipsData.length;
+                tipElement.style.opacity = 0;
+                setTimeout(() => {
+                    tipElement.textContent = tipsData[currentTipIndex];
+                    tipElement.style.opacity = 1;
+                }, 500);
+            }
+        }
+        
+        const changingText = document.getElementById('text_tips');
+        
+        function changeText() {
+            changingText.style.opacity = 0;
+            setTimeout(() => {
+                changingText.style.opacity = 1;
+                SelectTip();
+                startThink();
+            }, 500);
+        }
+        
+        function startThink() {
+            setTimeout(() => {
+                changeText();
+            }, 12000);
+        }
+        
+        setTimeout(() => { changeText(); }, 500);
+        
+        // ================ GARRY'S MOD INTEGRATION ================
+        const infoText = document.getElementById('info');
+        const mapText = document.getElementById('map');
+        
+        function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode, volume, language) {
+            try {
+                // Парсим название сервера
+                let serverNameParts = servername.split("|");
+                if (serverNameParts.length > 2) {
+                    infoText.textContent = serverNameParts[2].trim();
+                } else {
+                    infoText.textContent = servername;
+                }
+                
+                mapText.textContent = "On map: " + mapname;
+                currentLang = language;
+                
+                // Устанавливаем громкость из GMod
+                if (volume) {
+                    audio.volume = volume;
+                    volumeSlider.value = volume;
+                }
+            } catch (e) {
+                console.error('Error in GameDetails:', e);
+            }
+        }
+        
+        // Функция для скачивания ресурсов (опционально)
+        function DownloadingFile(fileName, fileProgress) {
+            if (fileProgress) {
+                let progress = Math.min(fileProgress * 100, 100);
+                updateProgress(progress);
+                
+                if (fileName) {
+                    document.getElementById('info').textContent = `Downloading: ${fileName.split('/').pop()}`;
+                }
+            }
+        }
+        
+        // SetVolume функция для GMod
+        function SetVolume(volume) {
+            audio.volume = volume;
+            volumeSlider.value = volume;
+            updateVolumeIcon();
+        }
+        
+        console.log('Loading screen initialized with music player');
+    </script>
+</body>
+</html>
