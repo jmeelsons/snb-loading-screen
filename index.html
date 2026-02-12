@@ -15,7 +15,7 @@
         <span class="text_1" style="color:white;"></span>
         
         <div style="margin-top: -2vh;">
-            <span class="info" id="server-name">Loading SNB-RU...</span>
+            <span class="info" id="server-name">Loading to SNB-RU...</span>
             <br>
             <span class="info" id="map-name"></span>
             <br>
@@ -102,7 +102,7 @@
                 })
                 .catch(error => {
                     console.error('Error loading tips:', error);
-                    document.getElementById('text_tips').textContent = 'Welcome to ZCity!';
+                    document.getElementById('text_tips').textContent = 'Welcome to SNB-RU Servers!';
                 });
         }
 
@@ -134,7 +134,7 @@
                 'Downloading maps',
                 'Sending client info',
                 'Almost there',
-                'Entering ZCity'
+                'Entering to server'
             ];
             
             let step = 0;
@@ -169,7 +169,7 @@
             
             // Set map name
             document.getElementById('map-name').textContent = mapname ? 
-                '📍 ' + mapname.replace('gm_', '').replace('_', ' ') : '';
+                '' + mapname.replace('gm_', '').replace('_', ' ') : '';
             
             // Set language
             if (language) {
