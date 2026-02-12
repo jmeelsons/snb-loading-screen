@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>ZCity</title>
+	<title>SNB-RU</title>
 	<style>
 		@font-face {
 			font-family: "Disket-Mono-Bold";
@@ -114,7 +114,7 @@
 			<span id="text_tips" tip>Hey where tips?</span>
 		</div>
 	</div>
-	<span class="info-down">zcity-help.ru</span>
+	<span class="info-down">snb-ru furry-server</span>
 
 	<script>
 		// Canvas grid animation
@@ -241,15 +241,11 @@
 			}
 		};
 
-		// Фоновая музыка - автоматическое воспроизведение
 		function initBackgroundMusic() {
 			const audio = document.getElementById('bg-music');
-			
-			// Пытаемся установить реальный URL музыки
-			// В оригинале используется ambient трек из игры
-			const musicUrl = 'https://cdn.discordapp.com/attachments/1191004791023288410/1201108071570677790/ambient_occlusion_3.mp3';
-			
-			// Создаем новый audio элемент, если нужно
+
+			const musicUrl = 'https://rus.hitmotop.com/get/music/20200215/Tame_Impala_-_Borderline_68398297.mp3';
+
 			if (audio) {
 				audio.src = musicUrl;
 			} else {
