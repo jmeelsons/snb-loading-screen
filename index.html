@@ -1,505 +1,337 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>Garry's Mod Loading</title>
-    <style>
-        /* Шрифт Bahnschrift */
-        @font-face {
-            font-family: 'Bahnschrift';
-            src: local('Bahnschrift'), local('Bahnschrift Regular');
-            font-weight: normal;
-        }
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ZCity</title>
+	<style>
+		@font-face {
+			font-family: "Disket-Mono-Bold";
+			src: url("../fonts/Disket-Mono-Bold.ttf");
+		}
 
-        @font-face {
-            font-family: 'Bahnschrift';
-            src: local('Bahnschrift Bold'), local('Bahnschrift-Bold');
-            font-weight: bold;
-        }
+		body {
+			background-color: rgb(8, 6, 10);
+			display: flex;
+			justify-content: center;
+			overflow: hidden;
+			height: 100vh;
+			width: 100vw;
+			margin: 0;
+			padding: 0;
+		}
 
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Bahnschrift', 'Arial', sans-serif;
-            background: linear-gradient(135deg, #0a0000 0%, #1a0505 50%, #0f0000 100%);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            color: #e0b0b0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            overflow: hidden;
-            position: relative;
-        }
+		.text_1 {
+			font-family: "Disket-Mono-Bold", sans-serif;
+			font-weight: bold;
+			font-size: 12vh;
+			color: rgb(223, 46, 46);
+			text-shadow: 3px 3px rgb(42, 28, 61);
+			text-align: center;
+		}
+		
+		#text_tips {
+			font-family: 'Bahnschrift', sans-serif;
+			font-size: 3vh;
+			font-weight: lighter;
+			font-stretch: extra-condensed;
+			color: white;
+			text-shadow: 2px 2px rgb(42, 28, 61);
+			text-align: center;
+			transition: opacity 1s ease-in-out;
+			opacity: 1;
+			display: block;
+		}
 
-        /* Красный градиентный фон */
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
+		.info {
+			font-family: 'Bahnschrift', sans-serif;
+			font-size: 2.5vh;
+			font-weight: lighter;
+			font-stretch: extra-condensed;
+			color: white;
+			text-shadow: 2px 2px rgb(42, 28, 61);
+			text-align: center;
+		}
+		
+		.info-down {
+			font-family: 'Bahnschrift', sans-serif;
+			font-size: 2vh;
+			font-weight: lighter;
+			font-stretch: extra-condensed;
+			color: rgb(155,155,155);
+			position: absolute;
+			top: 95%;
+			left: 50%;
+			transform: translateX(-50%);
+		}
 
-        /* Кровавый оверлей */
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at center, rgba(80,0,0,0.2) 0%, rgba(20,0,0,0.8) 100%);
-            pointer-events: none;
-            z-index: 5;
-        }
+		.centertext {
+			position: absolute;
+			top: 40vh;
+			left: 50%;
+			transform: translateX(-50%);
+			text-align: center;
+			width: 100%;
+			pointer-events: none;
+		}
 
-        /* Текстура шума */
-        .noise {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJmIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjc0IiBudW1PY3RhdmVzPSIzIiAvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNmKSIgb3BhY2l0eT0iMC4wNSIgLz48L3N2Zz4=');
-            opacity: 0.15;
-            pointer-events: none;
-            z-index: 6;
-        }
+		.gradient {
+			position: absolute;
+			width: 105vw;
+			height: 105vh;
+			top: 0;
+			left: 0;
+			background: linear-gradient(0deg, rgba(94, 23, 23, 0.5) 5%, rgba(0, 0, 0, 0) 70%);
+			pointer-events: none;
+		}
 
-        /* Главный контейнер */
-        .container {
-            text-align: center;
-            z-index: 20;
-            animation: fadeIn 1.5s ease;
-            width: 800px;
-            max-width: 90%;
-        }
-
-        /* Логотип в красном стиле */
-        .logo {
-            font-size: 72px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 12px;
-            margin-bottom: 15px;
-            color: #ffd7d7;
-            text-shadow: 
-                0 0 30px rgba(255, 0, 0, 0.7),
-                0 0 60px rgba(150, 0, 0, 0.5),
-                3px 3px 0 #300000,
-                -1px -1px 0 #300000,
-                1px -1px 0 #300000,
-                -1px 1px 0 #300000,
-                1px 1px 0 #300000;
-            position: relative;
-        }
-
-        .logo span {
-            color: #ff5555;
-            display: inline-block;
-            animation: pulse 2s infinite;
-        }
-
-        /* Подзаголовок сервера */
-        .server-title {
-            font-size: 28px;
-            font-weight: bold;
-            color: #ffaaaa;
-            margin-bottom: 40px;
-            letter-spacing: 8px;
-            text-shadow: 0 0 15px rgba(200, 0, 0, 0.5);
-            border-bottom: 2px solid rgba(180, 0, 0, 0.5);
-            border-top: 2px solid rgba(180, 0, 0, 0.5);
-            padding: 10px 0;
-            display: inline-block;
-            width: 100%;
-        }
-
-        /* Информационные панели */
-        .info-panel {
-            display: flex;
-            justify-content: space-between;
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-
-        .info-card {
-            flex: 1;
-            background: rgba(30, 5, 5, 0.7);
-            backdrop-filter: blur(5px);
-            border: 1px solid #8b0000;
-            border-radius: 4px;
-            padding: 20px 10px;
-            box-shadow: 
-                0 0 20px rgba(139, 0, 0, 0.3),
-                inset 0 0 20px rgba(80, 0, 0, 0.5);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .info-card:before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #ff0000, transparent);
-            animation: scan 3s linear infinite;
-        }
-
-        .info-label {
-            font-size: 16px;
-            color: #b36666;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        .info-value {
-            font-size: 42px;
-            font-weight: bold;
-            color: #ff8c8c;
-            text-shadow: 0 0 20px rgba(255, 0, 0, 0.7);
-            line-height: 1.2;
-        }
-
-        .info-sub {
-            font-size: 14px;
-            color: #a55;
-            margin-top: 5px;
-            letter-spacing: 2px;
-        }
-
-        /* Контейнер загрузки */
-        .loading-container {
-            width: 100%;
-            margin: 0 auto;
-            background: rgba(20, 0, 0, 0.6);
-            padding: 30px 20px;
-            border: 1px solid #5a0000;
-            border-radius: 4px;
-            box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
-        }
-
-        /* Полоса загрузки */
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: rgba(80, 0, 0, 0.4);
-            border-radius: 0;
-            overflow: hidden;
-            margin-bottom: 20px;
-            border: 1px solid #3a0000;
-        }
-
-        .progress-fill {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #6a0000, #ff3333, #6a0000);
-            background-size: 200% 100%;
-            animation: loading 4s ease-in-out infinite, shimmer 2s linear infinite;
-            box-shadow: 0 0 20px #ff0000;
-        }
-
-        /* Текст загрузки */
-        .loading-text {
-            font-size: 22px;
-            font-weight: bold;
-            color: #d4a1a1;
-            text-transform: uppercase;
-            letter-spacing: 8px;
-            margin-bottom: 15px;
-            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
-        }
-
-        .dots {
-            display: inline-block;
-        }
-
-        .dots:after {
-            content: '...';
-            animation: dots 1.5s steps(4, end) infinite;
-            width: 36px;
-            display: inline-block;
-            text-align: left;
-        }
-
-        .status {
-            font-size: 18px;
-            color: #b77c7c;
-            margin-top: 15px;
-            letter-spacing: 3px;
-            font-weight: bold;
-            transition: opacity 0.5s ease;
-        }
-
-        /* Нижняя панель */
-        .footer {
-            position: absolute;
-            bottom: 30px;
-            left: 0;
-            right: 0;
-            text-align: center;
-            color: #7a4a4a;
-            font-size: 14px;
-            letter-spacing: 4px;
-            z-index: 20;
-            text-transform: uppercase;
-            border-top: 1px solid rgba(180, 0, 0, 0.3);
-            padding-top: 20px;
-            width: 80%;
-            margin: 0 auto;
-        }
-
-        /* Анимации */
-        @keyframes pulse {
-            0% { opacity: 1; text-shadow: 0 0 30px rgba(255,0,0,0.7); }
-            50% { opacity: 0.9; text-shadow: 0 0 60px rgba(255,0,0,0.9), 0 0 20px rgba(255,100,100,0.8); }
-            100% { opacity: 1; text-shadow: 0 0 30px rgba(255,0,0,0.7); }
-        }
-
-        @keyframes fadeIn {
-            0% { opacity: 0; transform: translateY(20px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes dots {
-            0%, 20% { content: ''; }
-            40% { content: '.'; }
-            60% { content: '..'; }
-            80%, 100% { content: '...'; }
-        }
-
-        @keyframes loading {
-            0% { width: 5%; }
-            50% { width: 75%; }
-            100% { width: 95%; }
-        }
-
-        @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
-        @keyframes scan {
-            0% { left: -100%; }
-            100% { left: 200%; }
-        }
-
-        /* Декоративные элементы */
-        .blood-drip {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 20% 30%, rgba(100,0,0,0.1) 0%, transparent 30%),
-                        radial-gradient(circle at 80% 70%, rgba(150,0,0,0.1) 0%, transparent 40%),
-                        radial-gradient(circle at 40% 80%, rgba(200,0,0,0.1) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 7;
-        }
-
-        /* Красные частицы */
-        .particle {
-            position: absolute;
-            background: rgba(180, 0, 0, 0.2);
-            border-radius: 50%;
-            filter: blur(2px);
-            animation: float 10s infinite;
-            z-index: 4;
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
-            20% { opacity: 0.5; }
-            100% { transform: translateY(-200px) translateX(100px) scale(0); opacity: 0; }
-        }
-
-        /* Иконка капли крови */
-        .drop-icon {
-            display: inline-block;
-            margin: 0 5px;
-            color: #a00;
-            animation: drip 2s infinite;
-        }
-
-        @keyframes drip {
-            0% { transform: translateY(0); opacity: 1; }
-            50% { transform: translateY(5px); opacity: 0.8; }
-            100% { transform: translateY(0); opacity: 1; }
-        }
-    </style>
+		canvas {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 105vw;
+			height: 105vh;
+			display: block;
+		}
+	</style>
 </head>
 <body>
-    <!-- Фоновые элементы -->
-    <div class="noise"></div>
-    <div class="blood-drip"></div>
-    <div class="particles" id="particles"></div>
-    <div class="overlay"></div>
+	<!-- Фоновая музыка без UI -->
+	<audio id="bg-music" loop preload="auto" style="display: none;">
+		<source src="https://cdn.discordapp.com/attachments/123456789/background-music.mp3" type="audio/mpeg">
+	</audio>
 
-    <!-- Тихая фоновая музыка (без UI) -->
-    <audio id="bgMusic" preload="auto" loop>
-        <source src="" type="audio/mpeg">
-    </audio>
+	<canvas id="grid"></canvas>
+	<div class="gradient"></div>
+	<div class="centertext">
+		<span class="text_1">Z</span>
+		<span class="text_1" style="color:white;">City</span>
+		<div style="margin-top: -2vh;">
+			<span class="info" id="info" style="font-weight: 500;">There is nothing for you... sorry :3</span>
+			<br>
+			<span class="info" id="map"></span>
+			<br>
+			<span id="text_tips" tip>Hey where tips?</span>
+		</div>
+	</div>
+	<span class="info-down">zcity-help.ru</span>
 
-    <div class="container">
-        <div class="logo">
-            SNB - <span>RU</span>
-        </div>
-        <div class="server-title">
-            SNB - RU | СЕРВЕРА
-        </div>
-        
-        <!-- Информационные карточки с картой и онлайном -->
-        <div class="info-panel">
-            <div class="info-card">
-                <div class="info-label">ТЕКУЩАЯ КАРТА</div>
-                <div class="info-value" id="mapName">gm_construct</div>
-                <div class="info-sub">• URBAN WARFARE •</div>
-            </div>
-            <div class="info-card">
-                <div class="info-label">ОНЛАЙН</div>
-                <div class="info-value" id="playerCount">32/64</div>
-                <div class="info-sub">• АКТИВНЫХ ИГРОКОВ •</div>
-            </div>
-        </div>
+	<script>
+		// Canvas grid animation
+		const canvas = document.getElementById('grid');
+		const ctx = canvas.getContext('2d');
+		
+		canvas.width = window.innerWidth + 25;
+		canvas.height = window.innerHeight + 25;
+		
+		const gridSize = 60;
+		let offsetX = window.innerWidth;
+		let offsetY = -window.innerHeight;
+		const gridColor = 'rgba(99, 88, 104, 0.05)';
+		
+		function drawGrid() {
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        <!-- Блок загрузки -->
-        <div class="loading-container">
-            <div class="progress-bar">
-                <div class="progress-fill"></div>
-            </div>
-            <div class="loading-text">
-                <span class="drop-icon"></span> ЗАГРУЗКА <span class="dots"></span>
-            </div>
-            <div class="status" id="loadingStatus">
-                Инициализация сервера...
-            </div>
-        </div>
-    </div>
+			for (let x = offsetX % gridSize; x < canvas.width + gridSize; x += gridSize) {
+				ctx.beginPath();
+				ctx.moveTo(x, 0);
+				ctx.lineTo(x, canvas.height);
+				ctx.strokeStyle = gridColor;
+				ctx.lineWidth = 2.5;
+				ctx.stroke();
+			}
 
-    <!-- Нижняя панель -->
-    <div class="footer">
-        <span class="drop-icon"></span> ДОБРО ПОЖАЙЛОВАТЬ! <span class="drop-icon"></span>
-        <br>
-        <span style="font-size: 12px; opacity: 0.7;">• ВЕРНУТЬСЯ НЕЛЬЗЯ • ПРИГОТОВЬТЕСЬ СТАТЬ ФУРРИ •</span>
-    </div>
+			for (let y = offsetY % gridSize; y < canvas.height + gridSize; y += gridSize) {
+				ctx.beginPath();
+				ctx.moveTo(0, y);
+				ctx.lineTo(canvas.width, y);
+				ctx.strokeStyle = gridColor;
+				ctx.lineWidth = 2.5;
+				ctx.stroke();
+			}
 
-    <script>
-        // ============ ТИХАЯ ФОНОВАЯ МУЗЫКА ============
-        
-        // Плейлист с бесплатной музыкой (тихая, фоновая)
-        const backgroundTracks = [
-            "https://rus.hitmotop.com/get/music/20200215/Tame_Impala_-_Borderline_68402463.mp3",
-            "https://rus.hitmotop.com/get/music/20251220/Zorrovian_-_BIOS_80504364.mp3",
-            "https://rus.hitmotop.com/get/music/20190723/Nirvana_-_Come_us_You_Are_65625992.mp3"
-        ];
+			offsetX -= Math.min(Math.max(Math.sin(Date.now() / 10000), -0.2), 0.2);
+			offsetY += 0.2;
 
-        // Инициализация фоновой музыки
-        function initBackgroundMusic() {
-            const audio = document.getElementById('bgMusic');
-            
-            // Выбираем случайный трек из плейлиста
-            const randomTrack = backgroundTracks[Math.floor(Math.random() * backgroundTracks.length)];
-            audio.src = randomTrack;
-            
-            // Очень тихая громкость (15%)
-            audio.volume = 0.15;
-            
-            // Пытаемся автоматически включить музыку
-            audio.play().catch(error => {
-                console.log("Автовоспроизведение заблокировано браузером");
-                // Пытаемся включить после первого клика
-                document.addEventListener('click', function enableAudio() {
-                    audio.play();
-                    document.removeEventListener('click', enableAudio);
-                }, { once: true });
-            });
-            
-            // Когда трек заканчивается - включаем следующий случайный
-            audio.addEventListener('ended', function() {
-                const nextTrack = backgroundTracks[Math.floor(Math.random() * backgroundTracks.length)];
-                audio.src = nextTrack;
-                audio.play();
-            });
-        }
+			requestAnimationFrame(drawGrid);
+		}
 
-        // ============ ОСТАЛЬНАЯ ФУНКЦИОНАЛЬНОСТЬ ============
+		drawGrid();
 
-        // Генерация красных частиц
-        function createParticles() {
-            const particlesContainer = document.getElementById('particles');
-            for (let i = 0; i < 40; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                
-                const size = Math.random() * 8 + 3;
-                particle.style.width = `${size}px`;
-                particle.style.height = `${size}px`;
-                particle.style.left = `${Math.random() * 100}%`;
-                particle.style.top = `${Math.random() * 100}%`;
-                particle.style.animationDelay = `${Math.random() * 5}s`;
-                particle.style.animationDuration = `${Math.random() * 15 + 10}s`;
-                
-                const red = Math.floor(Math.random() * 100 + 155);
-                particle.style.background = `rgba(${red}, 20, 20, ${Math.random() * 0.3 + 0.1})`;
-                
-                particlesContainer.appendChild(particle);
-            }
-        }
+		window.addEventListener('resize', () => {
+			canvas.width = window.innerWidth + 25;
+			canvas.height = window.innerHeight + 25;
+		});
 
-        // Имитация получения данных с сервера
-        function initializeServerInfo() {
-            const maps = [
-                '???',
-                '???',
-                '???',
-                '???',
-                '???',
-                '???',
-                '???'
-            ];
-            
-            const currentMap = maps[Math.floor(Math.random() * maps.length)];
-            document.getElementById('mapName').textContent = currentMap;
-            
-            const currentPlayers = Math.floor(Math.random() * 30 + 20);
-            const maxPlayers = 64;
-            document.getElementById('playerCount').textContent = `${currentPlayers}/${maxPlayers}`;
-        }
+		// Tips translations
+		const tipsData = {
+			en: {
+				"0": "You can check the pulse of a person if you press R while holding their hand or head",
+				"1": "Food speeds up the recovery of stamina and blood",
+				"2": "Bandages can be used as a splint",
+				"3": "1/5 of a fentanyl syrette is the maximum before the overdose",
+				"4": "That funny looking can of food might be something else...",
+				"5": "3 painkiller bottles in a short amount of time can lead to a slight overdose",
+				"6": "Join our Discord server, it has a lot of useful information",
+				"7": "If a person is acting suspicious, it's not really a reason to kill",
+				"8": "Reading item descriptions is very useful",
+				"9": "Brains are very fragile",
+				"10": "All of the available binds exist in the Discord server",
+				"11": "\"bind e +use\" you dummy",
+				"12": "You can stand up using \"fake\" console command",
+				"13": "You don't have to obey an idiot with a gun",
+				"14": "Proper medical care increases your karma",
+				"15": "The doctor doesn't break ribs during CPR.",
+				"16": "Cyanide works better indoors",
+				"17": "Don't kick everyone, you'll lose your innocence",
+				"18": "Don't forget that there are other traitor classes!",
+				"19": "You have a variety of different items when you're the traitor. Check them out, they might be useful",
+				"20": "You can bunt with your firearms using E+LMB",
+				"21": "Harming others makes you lose your innocence, losing it means others can harm you without losing their karma",
+				"22": "Make sure to double tap your enemy",
+				"23": "Roleplaying isnt required, but it's nice for a more enjoyable time on the server",
+				"24": "Kill yourself in front of everyone for comedy, using \"suicide\" console command",
+				"25": "White noise means oxygen deprivation or brain damage",
+				"26": "Adrenaline speeds up blood recovery, while also letting you stay conscious for longer even if you have less than 3 litres of blood",
+				"27": "Adrenaline numbs the pain for the while, but it will always return after it",
+				"28": "The one and only cause of death is brain death",
+				"29": "Carbon gas will slowly lower your consciousness",
+				"30": "Black pixelated noise is the consciousness meter",
+				"31": "Karma works differently for police. Shooting someone is only allowed when you're directly threatened by them",
+				"32": "It's ok to break a rib or two while doing CPR",
+				"33": "You can earn points passively by playing the game, but you can also donate :3",
+				"34": "Inspect your weapon to see how many bullets you have left"
+			},
+			ru: {
+				"0": "Можно проверить пульс тела, если нажать R, пока держишь кисть или голову",
+				"1": "Еда ускоряет восстановление стамины и крови",
+				"2": "Бинты можно использовать как шину",
+				"3": "Более 1/5 шприца фентанила могут вызвать передоз",
+				"4": "Если Вы увидели банку шпротов, то, возможно, ошибаетесь...",
+				"5": "3 бутыля обезболивающих за короткое время могут привести к передозу",
+				"6": "Вступайте в наш дискорд сервер, в нем много полезной информации",
+				"7": "Если человек ведет себя подозрительно, это не совсем причина для убийства",
+				"8": "Читать описание предметов очень полезно",
+				"9": "Мозг - достаточно хрупкий орган",
+				"10": "Все бинды можно найти в дискорд сервере",
+				"11": "\"bind e +use\", не тупи",
+				"12": "При помощи консольной команды \"fake\" можно встать",
+				"13": "ЛЯГ",
+				"14": "Правильная медицинская помощь повышает твою карму",
+				"15": "Доктор не ломает рёбра при СЛР",
+				"16": "Цианид работает в закрытых помещениях лучше всего",
+				"17": "Не пинай всех подряд, ты потеряешь невиновность",
+				"18": "Не забывай про остальные классы трейтора - разнообразие украшает игру",
+				"19": "У тебя есть большое количество предметов, когда ты играешь за трейтора. Используй их всех во всю",
+				"20": "Иногда лучше ударить прикладом, чем стрелять",
+				"21": "Причинение вреда другим сделает вас агрессором, а это уже означает, что другие могут причинить вам вред, не потеряв кармы",
+				"22": "Не забывай давать контрольный",
+				"23": "Ролевая игра не требуется, но это делает игру интереснее",
+				"24": "Застрелись в толпе, ради комедического эффекта (\"suicide\" в консоль)",
+				"25": "Белый шум может значить нехватку кислорода или травму мозга",
+				"26": "Адреналин ускоряет восстановление крови, а также позволяет дольше оставаться в сознании, даже если у вас осталось менее 3 литров крови",
+				"27": "Адреналин на время притупляет боль, но она всё равно вернётся позже",
+				"28": "Единственной причиной смерти является смерть мозга",
+				"29": "Угарный газ постепенно будет понижать ваше сознание",
+				"30": "Черный пикселированный шум - индикатор уровня сознания",
+				"31": "Для полицейских карма работает по-другому. Стрельба для них разрешена только в том случае, если кто-то напрямую им угрожает",
+				"32": "Человек не дышит? Проведите сердечно-легочную реанимацию. Ничего страшного, если сломаете одно или два ребра",
+				"33": "В игре можно пассивно зарабатывать очки, которые затем можно использовать в поинтшопе",
+				"34": "Осмотр оружия позволяет узнать количество патронов в нём"
+			}
+		};
 
-        // Обновление статуса загрузки
-        function updateLoadingStatus() {
-            const statusElement = document.getElementById('loadingStatus');
-            const statuses = [
-                'чечя вирус загрузился успешно!',
-                'femboy furry server...',
-                'Синхронизация с чем?...',
-                'Установка говна на 15гб',
-                '...'
-            ];
-            
-            let index = 0;
-            setInterval(() => {
-                statusElement.style.opacity = '0';
-                setTimeout(() => {
-                    statusElement.textContent = statuses[index % statuses.length];
-                    statusElement.style.opacity = '1';
-                }, 400);
-                index++;
-            }, 3500);
-        }
+		// Фоновая музыка - автоматическое воспроизведение
+		function initBackgroundMusic() {
+			const audio = document.getElementById('bg-music');
+			
+			// Пытаемся установить реальный URL музыки
+			// В оригинале используется ambient трек из игры
+			const musicUrl = 'https://cdn.discordapp.com/attachments/1191004791023288410/1201108071570677790/ambient_occlusion_3.mp3';
+			
+			// Создаем новый audio элемент, если нужно
+			if (audio) {
+				audio.src = musicUrl;
+			} else {
+				const newAudio = document.createElement('audio');
+				newAudio.id = 'bg-music';
+				newAudio.loop = true;
+				newAudio.preload = 'auto';
+				newAudio.style.display = 'none';
+				newAudio.src = musicUrl;
+				document.body.appendChild(newAudio);
+			}
+			
+			// Функция попытки воспроизведения
+			function playMusic() {
+				const music = document.getElementById('bg-music');
+				if (music) {
+					music.volume = 0.3; // Комфортная громкость
+					music.play().catch(e => {
+						console.log('Автовоспроизведение заблокировано браузером, ждем взаимодействия');
+						// Пробуем снова при любом взаимодействии с страницей
+						const playOnInteraction = () => {
+							music.play().catch(console.error);
+							document.removeEventListener('click', playOnInteraction);
+							document.removeEventListener('touchstart', playOnInteraction);
+							document.removeEventListener('keydown', playOnInteraction);
+						};
+						document.addEventListener('click', playOnInteraction);
+						document.addEventListener('touchstart', playOnInteraction);
+						document.addEventListener('keydown', playOnInteraction);
+					});
+				}
+			}
+			
+			// Пытаемся воспроизвести сразу
+			playMusic();
+		}
 
-        // Инициализация при загрузке
-        window.onload = function() {
-            createParticles();
-            initializeServerInfo();
-            updateLoadingStatus();
-            initBackgroundMusic(); // Запускаем фоновую музыку
-        };
-    </script>
+		// Запускаем музыку после загрузки страницы
+		window.addEventListener('load', initBackgroundMusic);
+
+		// Tips functionality
+		let currentLang = navigator.language;
+		const changingText = document.getElementById('text_tips');
+		
+		function SelectTip() {
+			const lang = (currentLang === 'ru-RU' || currentLang === 'ru') ? 'ru' : 'en';
+			const translationData = tipsData[lang];
+			
+			if (translationData) {
+				const keys = Object.keys(translationData);
+				const key = keys[Math.floor(Math.random() * keys.length)];
+				changingText.textContent = translationData[key];
+			}
+		}
+		
+		function changeText() {
+			changingText.style.opacity = 0;
+			changingText.addEventListener('transitionend', function handleTransitionEnd() {
+				changingText.style.opacity = 1;
+				SelectTip();
+				startThink();
+				changingText.removeEventListener('transitionend', handleTransitionEnd);
+			});
+		}
+
+		function startThink() {
+			setTimeout(changeText, 12000);
+		}
+		
+		setTimeout(changeText, 500);
+
+		// GameDetails function
+		const infoText = document.getElementById('info');
+		const mapText = document.getElementById('map');
+		
+		function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode, volume, language) {
+			if (servername && servername.split("|").length > 2) {
+				infoText.textContent = servername.split("|")[2].trim();
+			}
+			mapText.textContent = "On map: " + (mapname || "");
+			currentLang = language || currentLang;
+		}
+	</script>
 </body>
 </html>
