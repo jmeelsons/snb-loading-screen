@@ -175,7 +175,7 @@
         /* Контейнер загрузки */
         .loading-container {
             width: 100%;
-            margin: 30px auto;
+            margin: 0 auto;
             background: rgba(20, 0, 0, 0.6);
             padding: 30px 20px;
             border: 1px solid #5a0000;
@@ -340,6 +340,11 @@
     <div class="particles" id="particles"></div>
     <div class="overlay"></div>
 
+    <!-- Тихая фоновая музыка (без UI) -->
+    <audio id="bgMusic" preload="auto" loop>
+        <source src="" type="audio/mpeg">
+    </audio>
+
     <div class="container">
         <div class="logo">
             GARRY'S <span>MOD</span>
@@ -376,7 +381,7 @@
         </div>
     </div>
 
-    <!-- Нижняя панель с предупреждением -->
+    <!-- Нижняя панель -->
     <div class="footer">
         <span class="drop-icon">⚠️</span> ВЫХОД НАХОДИТСЯ В ЗОНЕ ПОРАЖЕНИЯ <span class="drop-icon">⚠️</span>
         <br>
@@ -384,6 +389,46 @@
     </div>
 
     <script>
+        // ============ ТИХАЯ ФОНОВАЯ МУЗЫКА ============
+        
+        // Плейлист с бесплатной музыкой (тихая, фоновая)
+        const backgroundTracks = [
+            "https://rus.hitmotop.com/get/music/20200215/Tame_Impala_-_Borderline_68402463.mp3",
+            "https://rus.hitmotop.com/get/music/20251220/Zorrovian_-_BIOS_80504364.mp3",
+            "https://rus.hitmotop.com/get/music/20190723/Nirvana_-_Come_us_You_Are_65625992.mp3"
+        ];
+
+        // Инициализация фоновой музыки
+        function initBackgroundMusic() {
+            const audio = document.getElementById('bgMusic');
+            
+            // Выбираем случайный трек из плейлиста
+            const randomTrack = backgroundTracks[Math.floor(Math.random() * backgroundTracks.length)];
+            audio.src = randomTrack;
+            
+            // Очень тихая громкость (15%)
+            audio.volume = 0.15;
+            
+            // Пытаемся автоматически включить музыку
+            audio.play().catch(error => {
+                console.log("Автовоспроизведение заблокировано браузером");
+                // Пытаемся включить после первого клика
+                document.addEventListener('click', function enableAudio() {
+                    audio.play();
+                    document.removeEventListener('click', enableAudio);
+                }, { once: true });
+            });
+            
+            // Когда трек заканчивается - включаем следующий случайный
+            audio.addEventListener('ended', function() {
+                const nextTrack = backgroundTracks[Math.floor(Math.random() * backgroundTracks.length)];
+                audio.src = nextTrack;
+                audio.play();
+            });
+        }
+
+        // ============ ОСТАЛЬНАЯ ФУНКЦИОНАЛЬНОСТЬ ============
+
         // Генерация красных частиц
         function createParticles() {
             const particlesContainer = document.getElementById('particles');
@@ -408,9 +453,6 @@
 
         // Имитация получения данных с сервера
         function initializeServerInfo() {
-            // Эти значения будут заменены реальными данными из Garry's Mod
-            // Сейчас имитация для демонстрации
-            
             const maps = [
                 'rp_downtown_v2',
                 'gm_construct',
@@ -421,11 +463,9 @@
                 'rp_jail_v1'
             ];
             
-            // Для демонстрации - рандомная карта
             const currentMap = maps[Math.floor(Math.random() * maps.length)];
             document.getElementById('mapName').textContent = currentMap;
             
-            // Имитация онлайна
             const currentPlayers = Math.floor(Math.random() * 30 + 20);
             const maxPlayers = 64;
             document.getElementById('playerCount').textContent = `${currentPlayers}/${maxPlayers}`;
@@ -461,22 +501,7 @@
             createParticles();
             initializeServerInfo();
             updateLoadingStatus();
-            
-            // Эффект "пульса" для карты и онлайна
-            setInterval(() => {
-                // Имитация изменения онлайна
-                const playerElement = document.getElementById('playerCount');
-                const current = playerElement.textContent.split('/');
-                const currentCount = parseInt(current[0]);
-                const maxCount = parseInt(current[1]);
-                
-                // Небольшие колебания онлайна
-                let newCount = currentCount + (Math.random() > 0.5 ? 1 : -1);
-                if (newCount < 15) newCount = 16;
-                if (newCount > maxCount) newCount = maxCount - 1;
-                
-                playerElement.textContent = `${newCount}/${maxCount}`;
-            }, 10000); // Обновление каждые 10 секунд
+            initBackgroundMusic(); // Запускаем фоновую музыку
         };
     </script>
 </body>
