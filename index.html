@@ -5,184 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="style.css" rel="stylesheet">
     <title>ZCity Loading</title>
-    <style>
-        /* Дополнительные стили для чата */
-        .chat-container {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 500px;
-            max-width: 90vw;
-            height: 400px;
-            background: rgba(8, 6, 10, 0.85);
-            border: 2px solid rgba(223, 46, 46, 0.5);
-            border-radius: 10px;
-            box-shadow: 0 0 30px rgba(223, 46, 46, 0.3);
-            backdrop-filter: blur(5px);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            z-index: 10;
-            pointer-events: none;
-        }
-
-        .chat-header {
-            background: rgba(223, 46, 46, 0.2);
-            padding: 10px 15px;
-            border-bottom: 1px solid rgba(223, 46, 46, 0.5);
-            font-family: 'Bahnschrift', sans-serif;
-            color: rgb(223, 46, 46);
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-size: 14px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .chat-messages {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            font-family: 'Bahnschrift', sans-serif;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(223, 46, 46, 0.5) rgba(42, 28, 61, 0.3);
-        }
-
-        .chat-messages::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .chat-messages::-webkit-scrollbar-track {
-            background: rgba(42, 28, 61, 0.3);
-        }
-
-        .chat-messages::-webkit-scrollbar-thumb {
-            background: rgba(223, 46, 46, 0.5);
-            border-radius: 3px;
-        }
-
-        .chat-message {
-            color: white;
-            font-size: 14px;
-            line-height: 1.4;
-            word-wrap: break-word;
-            animation: fadeIn 0.3s ease;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-        }
-
-        .chat-message.system {
-            color: rgba(255, 255, 255, 0.7);
-            font-style: italic;
-            border-left: 2px solid rgba(223, 46, 46, 0.5);
-            padding-left: 8px;
-        }
-
-        .chat-message.player {
-            border-left: 2px solid rgba(223, 46, 46, 0.8);
-            padding-left: 8px;
-        }
-
-        .message-name {
-            color: rgb(223, 46, 46);
-            font-weight: bold;
-            margin-right: 5px;
-        }
-
-        .message-time {
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 11px;
-            margin-left: 5px;
-        }
-
-        .chat-input-container {
-            padding: 10px;
-            border-top: 1px solid rgba(223, 46, 46, 0.3);
-            display: flex;
-            gap: 8px;
-            background: rgba(0, 0, 0, 0.3);
-            pointer-events: auto;
-        }
-
-        .chat-input {
-            flex: 1;
-            background: rgba(42, 28, 61, 0.7);
-            border: 1px solid rgba(223, 46, 46, 0.5);
-            border-radius: 5px;
-            padding: 8px 12px;
-            color: white;
-            font-family: 'Bahnschrift', sans-serif;
-            font-size: 14px;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-
-        .chat-input:focus {
-            border-color: rgb(223, 46, 46);
-            box-shadow: 0 0 10px rgba(223, 46, 46, 0.3);
-            background: rgba(42, 28, 61, 0.9);
-        }
-
-        .chat-input::placeholder {
-            color: rgba(255, 255, 255, 0.3);
-        }
-
-        .chat-send {
-            background: rgba(223, 46, 46, 0.8);
-            border: none;
-            border-radius: 5px;
-            color: white;
-            font-family: 'Bahnschrift', sans-serif;
-            font-weight: bold;
-            padding: 8px 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            font-size: 12px;
-            letter-spacing: 1px;
-        }
-
-        .chat-send:hover {
-            background: rgb(223, 46, 46);
-            box-shadow: 0 0 15px rgba(223, 46, 46, 0.5);
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .online-count {
-            background: rgba(223, 46, 46, 0.2);
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            color: white;
-        }
-
-        /* Адаптация для мобильных устройств */
-        @media (max-width: 768px) {
-            .chat-container {
-                height: 300px;
-                width: 95vw;
-            }
-            
-            .chat-message {
-                font-size: 12px;
-            }
-        }
-    </style>
 </head>
 <body>
     <canvas id="grid"></canvas>
@@ -210,21 +32,6 @@
     
     <div class="info-down">
         discord.gg/ccVa3Mbk
-    </div>
-
-    <!-- Чат контейнер -->
-    <div class="chat-container">
-        <div class="chat-header">
-            <span>ЧАТ СЕРВЕРА</span>
-            <span class="online-count" id="online-count">0 онлайн</span>
-        </div>
-        <div class="chat-messages" id="chat-messages">
-            <!-- Сообщения будут добавляться сюда динамически -->
-        </div>
-        <div class="chat-input-container">
-            <input type="text" class="chat-input" id="chat-input" placeholder="Введите сообщение..." maxlength="100">
-            <button class="chat-send" id="chat-send">→</button>
-        </div>
     </div>
 
     <script>
@@ -316,154 +123,38 @@
             tipInterval = setInterval(changeText, 10000);
         }
 
-        // Система чата
-        class ChatSystem {
-            constructor() {
-                this.messagesContainer = document.getElementById('chat-messages');
-                this.input = document.getElementById('chat-input');
-                this.sendButton = document.getElementById('chat-send');
-                this.onlineCount = document.getElementById('online-count');
-                this.messageHistory = [];
-                this.maxMessages = 50;
-                this.playerCount = 0;
-                
-                this.setupEventListeners();
-                this.addSystemMessage('Чат загрузки инициализирован');
-                this.startMessageSimulation(); // Для демонстрации
-            }
-
-            setupEventListeners() {
-                this.sendButton.addEventListener('click', () => this.sendMessage());
-                this.input.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
-                        this.sendMessage();
-                    }
-                });
-            }
-
-            sendMessage() {
-                const text = this.input.value.trim();
-                if (text) {
-                    // Здесь будет отправка на сервер через WebSocket или другой протокол
-                    this.addPlayerMessage('Вы', text);
-                    this.input.value = '';
+        // Simulate loading progress (for preview)
+        function simulateLoading() {
+            const progressBar = document.getElementById('loading-progress');
+            const statusText = document.getElementById('loading-status');
+            
+            const statuses = [
+                'Connecting to server',
+                'Loading resources',
+                'Downloading maps',
+                'Sending client info',
+                'Almost there',
+                'Entering to server'
+            ];
+            
+            let step = 0;
+            const interval = setInterval(() => {
+                if (loadingProgress < 100) {
+                    loadingProgress += Math.random() * 15 + 5;
+                    if (loadingProgress > 100) loadingProgress = 100;
                     
-                    // Эмуляция ответа от сервера (для демонстрации)
-                    setTimeout(() => {
-                        this.addPlayerMessage('Игрок', 'Привет!', false);
-                    }, 1000);
-                }
-            }
-
-            addPlayerMessage(name, text, isLocal = true) {
-                const message = {
-                    type: 'player',
-                    name: isLocal ? name + ' (вы)' : name,
-                    text: text,
-                    time: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
-                };
-                this.addMessage(message);
-            }
-
-            addSystemMessage(text) {
-                const message = {
-                    type: 'system',
-                    text: text,
-                    time: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
-                };
-                this.addMessage(message);
-            }
-
-            addServerMessage(data) {
-                // Метод для получения сообщений от сервера
-                if (data.type === 'player') {
-                    this.addPlayerMessage(data.name, data.text, false);
-                } else if (data.type === 'system') {
-                    this.addSystemMessage(data.text);
-                }
-            }
-
-            addMessage(message) {
-                this.messageHistory.push(message);
-                if (this.messageHistory.length > this.maxMessages) {
-                    this.messageHistory.shift();
-                }
-                this.renderMessages();
-                this.scrollToBottom();
-            }
-
-            renderMessages() {
-                this.messagesContainer.innerHTML = '';
-                this.messageHistory.forEach(msg => {
-                    const messageElement = document.createElement('div');
-                    messageElement.className = `chat-message ${msg.type}`;
+                    progressBar.style.width = loadingProgress + '%';
                     
-                    if (msg.type === 'player') {
-                        messageElement.innerHTML = `
-                            <span class="message-name">${this.escapeHtml(msg.name)}</span>
-                            <span class="message-text">${this.escapeHtml(msg.text)}</span>
-                            <span class="message-time">${msg.time}</span>
-                        `;
-                    } else {
-                        messageElement.innerHTML = `
-                            <span class="message-text">⚡ ${this.escapeHtml(msg.text)}</span>
-                            <span class="message-time">${msg.time}</span>
-                        `;
-                    }
-                    
-                    this.messagesContainer.appendChild(messageElement);
-                });
-            }
-
-            escapeHtml(text) {
-                const div = document.createElement('div');
-                div.textContent = text;
-                return div.innerHTML;
-            }
-
-            scrollToBottom() {
-                this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
-            }
-
-            updatePlayerCount(count) {
-                this.playerCount = count;
-                this.onlineCount.textContent = count + ' онлайн';
-                
-                // Добавляем системное сообщение при изменении количества игроков
-                if (count > 0) {
-                    this.addSystemMessage(`На сервере ${count} игроков`);
+                    if (loadingProgress < 20) statusText.textContent = statuses[0];
+                    else if (loadingProgress < 40) statusText.textContent = statuses[1];
+                    else if (loadingProgress < 60) statusText.textContent = statuses[2];
+                    else if (loadingProgress < 80) statusText.textContent = statuses[3];
+                    else if (loadingProgress < 95) statusText.textContent = statuses[4];
+                    else statusText.textContent = statuses[5];
+                } else {
+                    clearInterval(interval);
                 }
-            }
-
-            // Для демонстрации - симуляция сообщений
-            startMessageSimulation() {
-                const demoMessages = [
-                    { type: 'system', text: 'Сервер запущен' },
-                    { type: 'player', name: 'Димон', text: 'всем привет!' },
-                    { type: 'player', name: 'Кибер', text: 'го на зиту' },
-                    { type: 'system', text: 'Игрок Stalker присоединился к серверу' },
-                    { type: 'player', name: 'Zлой', text: 'когда рестарт?' },
-                    { type: 'system', text: 'Карта загружается...' },
-                    { type: 'player', name: 'Механик', text: 'у всех лаги?' },
-                ];
-
-                let index = 0;
-                setInterval(() => {
-                    if (index < demoMessages.length) {
-                        const msg = demoMessages[index];
-                        if (msg.type === 'system') {
-                            this.addSystemMessage(msg.text);
-                        } else {
-                            this.addPlayerMessage(msg.name, msg.text, false);
-                        }
-                        index++;
-                    } else {
-                        // Обновляем счетчик игроков для демо
-                        const randomCount = Math.floor(Math.random() * 30) + 1;
-                        this.updatePlayerCount(randomCount);
-                    }
-                }, 8000);
-            }
+            }, 800);
         }
 
         // GMod integration
@@ -488,19 +179,11 @@
             // Initial tip
             SelectTip();
             startTipRotation();
-
-            // Добавляем системное сообщение о сервере
-            if (chatSystem) {
-                chatSystem.addSystemMessage(`Подключение к серверу: ${servername}`);
-                chatSystem.addSystemMessage(`Карта: ${mapname || 'неизвестно'}`);
-                chatSystem.updatePlayerCount(0);
-            }
         }
 
         function onUpdatePlayerCount(players) {
-            if (chatSystem) {
-                chatSystem.updatePlayerCount(players);
-            }
+            const maxPlayers = document.getElementById('server-name').textContent.includes('ZCity') ? 64 : 32;
+            document.getElementById('player-count').textContent = players + '/' + maxPlayers;
         }
 
         function LoadingProgress(progress) {
@@ -515,28 +198,11 @@
             }
         }
 
-        // Инициализация
-        let chatSystem;
-        
+        // Initialize
         setTimeout(() => {
             SelectTip();
             startTipRotation();
-            
-            // Инициализация чата
-            chatSystem = new ChatSystem();
-            
-            // Добавляем приветственное сообщение
-            chatSystem.addSystemMessage('Добро пожаловать на SNB-SEX!');
-            chatSystem.addSystemMessage('Используйте чат для общения во время загрузки');
-            
-            // Эмуляция подключения к серверу
-            setTimeout(() => {
-                chatSystem.addSystemMessage('Поиск сервера...');
-            }, 2000);
-            
-            setTimeout(() => {
-                chatSystem.addSystemMessage('Сервер найден, установка соединения...');
-            }, 4000);
+        //    simulateLoading(); // Удалите эту строку на реальном сервере
         }, 500);
     </script>
 </body>
