@@ -19,14 +19,36 @@
             <br>
             <span class="info" id="map-name"></span>
             <br>
+            
+            <!-- Основной контейнер загрузки -->
             <div class="loading-container">
+                <!-- Статус загрузки -->
                 <span class="info" id="loading-status">Connecting to server</span>
+                
+                <!-- Прогресс бар -->
                 <div class="loading-bar">
                     <div class="loading-progress" id="loading-progress"></div>
                 </div>
-                <!-- Новый элемент для отображения информации о файлах -->
-                <div class="file-info" id="file-info"></div>
+                
+                <!-- Детальная информация о загрузке -->
+                <div class="loading-details" id="loading-details">
+                    <!-- Этап загрузки -->
+                    <div class="loading-stage" id="loading-stage"></div>
+                    
+                    <!-- Информация о текущем файле -->
+                    <div class="file-info" id="file-info">
+                        <div class="file-name" id="file-name"></div>
+                        <div class="file-progress" id="file-progress"></div>
+                    </div>
+                    
+                    <!-- Счетчик файлов -->
+                    <div class="files-counter" id="files-counter"></div>
+                    
+                    <!-- Дополнительная информация -->
+                    <div class="loading-additional" id="loading-additional"></div>
+                </div>
             </div>
+            
             <br>
             <span id="text_tips" tip>Hey where tips?</span>
         </div>
@@ -82,17 +104,44 @@
             canvas.height = window.innerHeight + 25;
         });
 
-        // Loading tips system
+        // Loading system
         var currentLang = navigator.language;
         let tipInterval;
         let loadingProgress = 0;
         
-        // Переменные для отслеживания файлов
+        // Переменные для отслеживания загрузки
+        let currentStage = 'connecting';
         let currentFile = '';
         let downloadedBytes = 0;
         let totalBytes = 0;
         let filesDownloaded = 0;
         let totalFiles = 0;
+        let luaStarted = false;
+        let gameStarted = false;
+        
+        // Стадии загрузки
+        const stages = {
+            'connecting': {
+                name: 'Connecting to server',
+                next: 'downloading'
+            },
+            'downloading': {
+                name: 'Downloading files',
+                next: 'lua'
+            },
+            'lua': {
+                name: 'Starting Lua scripts',
+                next: 'spawning'
+            },
+            'spawning': {
+                name: 'Spawning player',
+                next: 'complete'
+            },
+            'complete': {
+                name: 'Entering server',
+                next: null
+            }
+        };
         
         function SelectTip() {
             const newLang = (currentLang === 'ru-RU' || currentLang === 'ru') ? 'ru' : 'en';
@@ -132,7 +181,7 @@
             tipInterval = setInterval(changeText, 10000);
         }
 
-        // Функция для форматирования байтов в читаемый вид
+        // Функция для форматирования байтов
         function formatBytes(bytes, decimals = 2) {
             if (bytes === 0) return '0 Bytes';
             
@@ -145,30 +194,68 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
         }
 
-        // Функция для обновления информации о файлах
-        function updateFileInfo() {
-            const fileInfoElement = document.getElementById('file-info');
-            if (!fileInfoElement) return;
+        // Функция для обновления статуса загрузки
+        function updateLoadingStatus() {
+            const statusElement = document.getElementById('loading-status');
+            const stageElement = document.getElementById('loading-stage');
+            const fileNameElement = document.getElementById('file-name');
+            const fileProgressElement = document.getElementById('file-progress');
+            const filesCounterElement = document.getElementById('files-counter');
+            const additionalElement = document.getElementById('loading-additional');
             
-            if (totalFiles > 0 && currentFile) {
-                // Показываем информацию о текущем файле
+            // Обновляем основной статус
+            if (luaStarted) {
+                statusElement.textContent = '⚡ Starting Lua scripts...';
+            } else if (gameStarted) {
+                statusElement.textContent = '🎮 Entering server...';
+            } else if (currentStage === 'downloading' && totalFiles > 0) {
+                statusElement.textContent = '📥 Downloading files...';
+            }
+            
+            // Обновляем этап загрузки
+            if (stages[currentStage]) {
+                stageElement.textContent = stages[currentStage].name;
+            }
+            
+            // Обновляем информацию о файле
+            if (currentFile && currentStage === 'downloading') {
                 const fileName = currentFile.split('/').pop() || currentFile;
-                const progress = totalBytes > 0 ? (downloadedBytes / totalBytes * 100).toFixed(1) : 0;
+                fileNameElement.textContent = `📄 ${fileName}`;
                 
-                fileInfoElement.innerHTML = `
-                    <div class="file-details">
-                        <div class="file-name">📁 ${fileName}</div>
-                        <div class="file-progress">${formatBytes(downloadedBytes)} / ${formatBytes(totalBytes)} (${progress}%)</div>
-                        <div class="files-counter">Файлы: ${filesDownloaded} / ${totalFiles}</div>
-                    </div>
-                `;
-            } else if (totalFiles > 0) {
-                // Показываем только счетчик файлов
-                fileInfoElement.innerHTML = `
-                    <div class="files-counter">Файлы: ${filesDownloaded} / ${totalFiles}</div>
-                `;
+                if (totalBytes > 0) {
+                    const percent = (downloadedBytes / totalBytes * 100).toFixed(1);
+                    fileProgressElement.textContent = `${formatBytes(downloadedBytes)} / ${formatBytes(totalBytes)} (${percent}%)`;
+                } else {
+                    fileProgressElement.textContent = formatBytes(downloadedBytes);
+                }
+                
+                fileNameElement.style.opacity = '1';
+                fileProgressElement.style.opacity = '1';
             } else {
-                fileInfoElement.innerHTML = '';
+                fileNameElement.style.opacity = '0';
+                fileProgressElement.style.opacity = '0';
+            }
+            
+            // Обновляем счетчик файлов
+            if (totalFiles > 0) {
+                filesCounterElement.textContent = `📦 Files: ${filesDownloaded} / ${totalFiles}`;
+                filesCounterElement.style.opacity = '1';
+            } else {
+                filesCounterElement.style.opacity = '0';
+            }
+            
+            // Обновляем дополнительную информацию
+            if (luaStarted) {
+                additionalElement.textContent = '🔧 Initializing Lua environment...';
+                additionalElement.style.opacity = '1';
+            } else if (currentStage === 'lua') {
+                additionalElement.textContent = '🔌 Loading Lua modules...';
+                additionalElement.style.opacity = '1';
+            } else if (gameStarted) {
+                additionalElement.textContent = '✨ Spawning player...';
+                additionalElement.style.opacity = '1';
+            } else {
+                additionalElement.style.opacity = '0';
             }
         }
 
@@ -184,7 +271,7 @@
             
             // Set map name
             document.getElementById('map-name').textContent = mapname ? 
-                '' + mapname.replace('gm_', '').replace('_', ' ') : '';
+                '🗺️ ' + mapname.replace('gm_', '').replace('_', ' ') : '';
             
             // Set language
             if (language) {
@@ -197,69 +284,104 @@
         }
 
         function onUpdatePlayerCount(players) {
-            const maxPlayers = document.getElementById('server-name').textContent.includes('ZCity') ? 64 : 32;
-            document.getElementById('player-count').textContent = players + '/' + maxPlayers;
+            // Можно добавить отображение игроков
         }
 
-        // Основная функция для отслеживания прогресса загрузки
+        // Основная функция прогресса
         function LoadingProgress(progress) {
             loadingProgress = Math.min(progress * 100, 100);
             const progressBar = document.getElementById('loading-progress');
+            
             if (progressBar) {
                 progressBar.style.width = loadingProgress + '%';
             }
             
+            // Определяем стадию загрузки на основе прогресса
+            if (loadingProgress < 10) {
+                currentStage = 'connecting';
+            } else if (loadingProgress < 60) {
+                currentStage = 'downloading';
+            } else if (loadingProgress < 85) {
+                currentStage = 'lua';
+            } else if (loadingProgress < 95) {
+                currentStage = 'spawning';
+            } else {
+                currentStage = 'complete';
+            }
+            
+            // Обновляем статусы
+            if (loadingProgress >= 60 && !luaStarted) {
+                luaStarted = true;
+            }
+            
+            if (loadingProgress >= 95 && !gameStarted) {
+                gameStarted = true;
+            }
+            
+            updateLoadingStatus();
+            
             if (loadingProgress >= 100) {
-                document.getElementById('loading-status').textContent = 'Starting game...';
-                // Скрываем информацию о файлах при завершении
-                const fileInfo = document.getElementById('file-info');
-                if (fileInfo) fileInfo.style.opacity = '0';
+                document.getElementById('loading-status').textContent = '✅ Starting game...';
             }
         }
 
-        // Специальные функции GMOD для отслеживания файлов
+        // Функции для отслеживания файлов
         function DownloadingFile(fileName) {
             currentFile = fileName;
-            updateFileInfo();
+            currentStage = 'downloading';
+            updateLoadingStatus();
         }
 
         function SetFilesTotal(numFiles) {
             totalFiles = numFiles;
             filesDownloaded = 0;
-            updateFileInfo();
-            
-            // Обновляем статус
-            document.getElementById('loading-status').textContent = 'Downloading files...';
+            updateLoadingStatus();
         }
 
         function SetFilesDownloaded(numFilesDownloaded) {
             filesDownloaded = numFilesDownloaded;
-            updateFileInfo();
+            updateLoadingStatus();
         }
 
         function SetTotalBytes(bytes) {
             totalBytes = bytes;
-            updateFileInfo();
+            updateLoadingStatus();
         }
 
         function SetDownloadedBytes(bytes) {
             downloadedBytes = bytes;
-            updateFileInfo();
+            updateLoadingStatus();
+        }
+
+        // Специальные функции для Lua
+        function LuaStarted() {
+            luaStarted = true;
+            currentStage = 'lua';
+            updateLoadingStatus();
+            
+            // Показываем сообщение о старте Lua
+            const additionalElement = document.getElementById('loading-additional');
+            additionalElement.textContent = '🎯 Lua Started!';
+            additionalElement.style.opacity = '1';
+            
+            setTimeout(() => {
+                if (additionalElement) {
+                    additionalElement.style.opacity = '0';
+                }
+            }, 3000);
+        }
+
+        function LuaModuleLoaded(moduleName) {
+            const additionalElement = document.getElementById('loading-additional');
+            additionalElement.textContent = `📦 Loaded: ${moduleName}`;
+            additionalElement.style.opacity = '1';
         }
 
         // Initialize
         setTimeout(() => {
             SelectTip();
             startTipRotation();
-            
-            // Добавляем элемент для отображения информации о файлах, если его нет
-            if (!document.getElementById('file-info')) {
-                const container = document.querySelector('.loading-container');
-                const fileInfo = document.createElement('div');
-                fileInfo.id = 'file-info';
-                fileInfo.className = 'file-info';
-                container.appendChild(fileInfo);
-            }
+            updateLoadingStatus();
         }, 500);
     </script>
 </body>
