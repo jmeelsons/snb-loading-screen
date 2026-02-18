@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu|Ubuntu+Condensed|Ubuntu+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <title>ZCity Loading | By Exsite</title>
+</head>
+<body>
+    <canvas id="grid"></canvas>
+    <div class="gradient"></div>
+    <div class="background"></div>
+    <div class="overhaul"></div>
+
+    <nav>
+        <div id="announcement"></div>
+        <span id="map">You're playing on </span>
+        <span id="steamid"></span>
+    </nav>
+
+    <div id="debug"></div>
+
+    <main>
+        <div class="title">
+            <h2>Welcome to,</h2>
+            <h1 id="title"></h1>
+            <div id="history"></div>
+        </div>
+        <div class="under-nav"></div>
+        <div class="loading-box"></div>
+    </main>
+
+    <div class="centertext">
+        <span class="text_1">Z</span>
+        <span class="text_1" style="color:white;">CITY</span>
+        
+        <div style="margin-top: -2vh;">
+            <span class="info" id="server-name">Loading to SNB-RU...</span>
+            <br>
+            <span class="info" id="map-name"></span>
+            <br>
+            <div class="loading-container">
+                <span class="info" id="loading-status">Connecting to server</span>
+                <div class="loading-bar">
+                    <div class="loading-progress" id="loading-progress"></div>
+                </div>
+            </div>
+            <br>
+            <span id="text_tips" tip>Hey where tips?</span>
+        </div>
+    </div>
+    
+    <div class="info-down">
+        discord.gg/ccVa3Mbk
+    </div>
+
+    <script src="js/lib/jquery-3.4.1.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        const canvas = document.getElementById('grid');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth + 25;
+        canvas.height = window.innerHeight + 25;
+        
+        const gridSize = 60;
+        let offsetX = window.innerWidth / 2;
+        let offsetY = -window.innerHeight / 2;
+        const gridColor = 'rgba(223, 46, 46, 0.08)';
+        
+        function drawGrid() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let x = offsetX % gridSize; x < canvas.width + gridSize; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.strokeStyle = gridColor;
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+            }
+
+            for (let y = offsetY % gridSize; y < canvas.height + gridSize; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.strokeStyle = gridColor;
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+            }
+
+            offsetX -= 0.15;
+            offsetY += 0.15;
+
+            requestAnimationFrame(drawGrid);
+        }
+
+        drawGrid();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth + 25;
+            canvas.height = window.innerHeight + 25;
+        });
+
+        // Loading tips system
+        var currentLang = navigator.language;
+        let tipInterval;
+        let loadingProgress = 0;
+        
+        function SelectTip() {
+            const newLang = (currentLang === 'ru-RU' || currentLang === 'ru') ? 'ru' : 'en';
+
+            fetch(`tips/${newLang}.json`)
+                .then(response => response.json())
+                .then(translationData => {
+                    const tips = document.querySelectorAll('[tip]');
+                    tips.forEach(element => {
+                        var keys = Object.keys(translationData);
+                        const key = keys[Math.floor(Math.random() * keys.length)];
+                        if (translationData[key]) {
+                            element.textContent = translationData[key];
+                        }
+                    });   
+                })
+                .catch(error => {
+                    console.error('Error loading tips:', error);
+                    document.getElementById('text_tips').textContent = 'Welcome to SNB-RU Servers!';
+                });
+        }
+
+        const changingText = document.getElementById('text_tips');
+        
+        function changeText() {
+            changingText.style.opacity = 0;
+            changingText.addEventListener('transitionend', function handleTransition() {
+                changingText.style.opacity = 1;
+                SelectTip();
+                changingText.removeEventListener('transitionend', handleTransition);
+            }, { once: true });
+        }
+
+        function startTipRotation() {
+            changeText();
+            if (tipInterval) clearInterval(tipInterval);
+            tipInterval = setInterval(changeText, 10000);
+        }
+
+        // GMod integration
+        function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode, volume, language) {
+            // Parse server name
+            const nameParts = servername.split("|");
+            if (nameParts.length > 2) {
+                document.getElementById('server-name').textContent = nameParts[2].trim();
+            } else {
+                document.getElementById('server-name').textContent = servername;
+            }
+            
+            // Set map name
+            document.getElementById('map-name').textContent = mapname ? 
+                '' + mapname.replace('gm_', '').replace('_', ' ') : '';
+            
+            // Set language
+            if (language) {
+                currentLang = language;
+            }
+            
+            // Initial tip
+            SelectTip();
+            startTipRotation();
+
+            // Call original GameDetails
+            if (window.originalGameDetails) {
+                window.originalGameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode);
+            }
+        }
+
+        function onUpdatePlayerCount(players) {
+            const maxPlayers = document.getElementById('server-name').textContent.includes('ZCity') ? 64 : 32;
+            document.getElementById('player-count').textContent = players + '/' + maxPlayers;
+        }
+
+        function LoadingProgress(progress) {
+            loadingProgress = Math.min(progress * 100, 100);
+            const progressBar = document.getElementById('loading-progress');
+            if (progressBar) {
+                progressBar.style.width = loadingProgress + '%';
+            }
+            
+            if (loadingProgress >= 100) {
+                document.getElementById('loading-status').textContent = 'Starting game...';
+            }
+        }
+
+        // Store original GameDetails
+        window.originalGameDetails = window.GameDetails;
+
+        // Initialize
+        setTimeout(() => {
+            SelectTip();
+            startTipRotation();
+        }, 500);
+    </script>
+</body>
+</html>
