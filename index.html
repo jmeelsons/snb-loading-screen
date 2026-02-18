@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link href="https://fonts.googleapis.com/css?family=Ubuntu|Ubuntu+Condensed|Ubuntu+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/main.css">
-    <title>snuff expie...</title>
+    <title>ZCity Loading | By Exsite</title>
 </head>
 <body>
     <canvas id="grid"></canvas>
@@ -33,11 +33,11 @@
     </main>
 
     <div class="centertext">
-        <span class="text_1">SNB-</span>
-        <span class="text_1" style="color:white;">RU</span>
+        <span class="text_1">Z</span>
+        <span class="text_1" style="color:white;">CITY</span>
         
         <div style="margin-top: -2vh;">
-            <span class="info" id="server-name">Loading to Server...</span>
+            <span class="info" id="server-name">Loading to SNB-RU...</span>
             <br>
             <span class="info" id="map-name"></span>
             <br>
@@ -47,6 +47,18 @@
                     <div class="loading-progress" id="loading-progress"></div>
                 </div>
             </div>
+            
+            <!-- Добавлен контейнер для отображения загружаемых файлов -->
+            <div class="files-container">
+                <div class="files-header">
+                    <span class="files-title">Downloading files:</span>
+                    <span class="files-count" id="files-count">0/0</span>
+                </div>
+                <div class="files-list" id="files-list">
+                    <!-- Сюда будут добавляться загружаемые файлы -->
+                </div>
+            </div>
+            
             <br>
             <span id="text_tips" tip>Hey where tips?</span>
         </div>
@@ -86,7 +98,7 @@
             for (let y = offsetY % gridSize; y < canvas.height + gridSize; y += gridSize) {
                 ctx.beginPath();
                 ctx.moveTo(0, y);
-                ctx.lineTo(canvas.width, y);
+                ctx.lineTo(canvas.height, y);
                 ctx.strokeStyle = gridColor;
                 ctx.lineWidth = 1.5;
                 ctx.stroke();
@@ -148,6 +160,128 @@
             tipInterval = setInterval(changeText, 10000);
         }
 
+        // Функции для отображения загружаемых файлов
+        let totalFiles = 0;
+        let downloadedFiles = 0;
+        const maxHistoryItems = 8;
+
+        function updateFilesCount() {
+            const countElement = document.getElementById('files-count');
+            if (countElement) {
+                countElement.textContent = `${downloadedFiles}/${totalFiles}`;
+            }
+        }
+
+        function addFileToList(filename, isStatus = false) {
+            const filesList = document.getElementById('files-list');
+            if (!filesList) return;
+
+            // Создаем элемент для файла/статуса
+            const item = document.createElement('div');
+            item.className = isStatus ? 'files-status-item' : 'files-item';
+            
+            // Добавляем иконку в зависимости от типа
+            const icon = isStatus ? '📋' : '📁';
+            
+            // Ограничиваем длину имени файла
+            let displayName = filename;
+            if (displayName.length > 40) {
+                displayName = displayName.substring(0, 37) + '...';
+            }
+            
+            item.innerHTML = `<span class="files-icon">${icon}</span> <span class="files-name">${displayName}</span>`;
+            
+            // Добавляем в начало списка
+            filesList.prepend(item);
+            
+            // Ограничиваем количество элементов в списке
+            const items = filesList.children;
+            while (items.length > maxHistoryItems) {
+                items[items.length - 1].remove();
+            }
+            
+            // Анимация появления
+            setTimeout(() => {
+                item.style.opacity = '1';
+                item.style.transform = 'translateX(0)';
+            }, 10);
+            
+            // Обновляем прозрачность старых элементов
+            Array.from(items).forEach((el, index) => {
+                if (index > 0) {
+                    el.style.opacity = Math.max(0.3, 1 - index * 0.15).toString();
+                }
+            });
+        }
+
+        // Переопределяем функции из main.js для интеграции
+        const originalSetFilesTotal = window.SetFilesTotal;
+        window.SetFilesTotal = function(total) {
+            totalFiles = total;
+            downloadedFiles = 0;
+            updateFilesCount();
+            
+            // Очищаем список файлов при новой загрузке
+            const filesList = document.getElementById('files-list');
+            if (filesList) {
+                filesList.innerHTML = '';
+            }
+            
+            if (originalSetFilesTotal) {
+                originalSetFilesTotal(total);
+            }
+        };
+
+        const originalSetFilesNeeded = window.SetFilesNeeded;
+        window.SetFilesNeeded = function(needed) {
+            if (totalFiles > 0) {
+                downloadedFiles = totalFiles - needed;
+                updateFilesCount();
+            }
+            
+            if (originalSetFilesNeeded) {
+                originalSetFilesNeeded(needed);
+            }
+        };
+
+        const originalDownloadingFile = window.DownloadingFile;
+        window.DownloadingFile = function(filename) {
+            // Очищаем имя файла от лишних символов
+            const cleanFilename = filename.replace(/'/g, '').replace(/\?/g, '');
+            
+            // Извлекаем только имя файла из полного пути
+            const shortName = cleanFilename.split('/').pop() || cleanFilename;
+            
+            addFileToList(shortName, false);
+            
+            if (originalDownloadingFile) {
+                originalDownloadingFile(filename);
+            }
+        };
+
+        const originalSetStatusChanged = window.SetStatusChanged;
+        window.SetStatusChanged = function(status) {
+            addFileToList(status, true);
+            
+            // Обновляем статус загрузки
+            const statusElement = document.getElementById('loading-status');
+            if (statusElement) {
+                if (status === 'Workshop Complete') {
+                    statusElement.textContent = 'Workshop files loaded';
+                } else if (status === 'Client info sent!') {
+                    statusElement.textContent = 'Connecting to server...';
+                } else if (status === 'Starting Lua...') {
+                    statusElement.textContent = 'Starting game...';
+                } else if (status.length < 30) {
+                    statusElement.textContent = status;
+                }
+            }
+            
+            if (originalSetStatusChanged) {
+                originalSetStatusChanged(status);
+            }
+        };
+
         // GMod integration
         function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode, volume, language) {
             // Parse server name
@@ -160,7 +294,7 @@
             
             // Set map name
             document.getElementById('map-name').textContent = mapname ? 
-                '' + mapname.replace('gm_', '').replace('_', ' ') : '';
+                '' + mapname.replace('gm_', '').replace(/_/g, ' ') : '';
             
             // Set language
             if (language) {
@@ -179,7 +313,10 @@
 
         function onUpdatePlayerCount(players) {
             const maxPlayers = document.getElementById('server-name').textContent.includes('ZCity') ? 64 : 32;
-            document.getElementById('player-count').textContent = players + '/' + maxPlayers;
+            const playerCountElement = document.getElementById('player-count');
+            if (playerCountElement) {
+                playerCountElement.textContent = players + '/' + maxPlayers;
+            }
         }
 
         function LoadingProgress(progress) {
@@ -196,11 +333,16 @@
 
         // Store original GameDetails
         window.originalGameDetails = window.GameDetails;
+        // Переопределяем глобальную функцию GameDetails
+        window.GameDetails = GameDetails;
 
         // Initialize
         setTimeout(() => {
             SelectTip();
             startTipRotation();
+            
+            // Инициализируем счетчик файлов
+            updateFilesCount();
         }, 500);
     </script>
 </body>
