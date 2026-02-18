@@ -68,6 +68,7 @@ body {
     background: rgba(42, 28, 61, 0.5);
     border-radius: 20px;
     margin-top: 1vh;
+    border: 1px solid rgba(223, 46, 46, 0.3);
 }
 
 .info-down {
@@ -119,7 +120,13 @@ canvas {
 .loading-container {
     margin: 3vh auto;
     width: 50%;
-    min-width: 300px;
+    min-width: 400px;
+    background: rgba(8, 6, 10, 0.7);
+    border-radius: 15px;
+    padding: 2vh 3vh;
+    border: 1px solid rgba(223, 46, 46, 0.3);
+    box-shadow: 0 0 30px rgba(223, 46, 46, 0.2);
+    backdrop-filter: blur(5px);
 }
 
 .loading-bar {
@@ -128,7 +135,7 @@ canvas {
     background: rgba(42, 28, 61, 0.7);
     border-radius: 5px;
     overflow: hidden;
-    margin-top: 1vh;
+    margin: 1.5vh 0;
     border: 1px solid rgba(223, 46, 46, 0.3);
     box-shadow: 0 0 10px rgba(223, 46, 46, 0.2);
 }
@@ -143,13 +150,101 @@ canvas {
     transition: width 0.3s ease;
     border-radius: 3px;
     box-shadow: 0 0 15px rgba(223, 46, 46, 0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+.loading-progress::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+    );
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
 }
 
 #loading-status {
-    font-size: 2.2vh;
-    color: rgba(255, 255, 255, 0.9);
+    font-size: 2.4vh;
+    color: rgb(223, 46, 46);
     text-transform: uppercase;
     letter-spacing: 3px;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(223, 46, 46, 0.5);
+}
+
+.loading-details {
+    margin-top: 2vh;
+    font-family: 'Bahnschrift', sans-serif;
+    color: white;
+    text-shadow: 1px 1px rgb(42, 28, 61);
+}
+
+.loading-stage {
+    font-size: 2vh;
+    color: rgba(223, 46, 46, 0.9);
+    margin-bottom: 1vh;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.file-info {
+    background: rgba(42, 28, 61, 0.5);
+    border-radius: 8px;
+    padding: 1.2vh 2vh;
+    margin: 1vh 0;
+    border: 1px solid rgba(223, 46, 46, 0.3);
+    transition: opacity 0.3s ease;
+}
+
+.file-name {
+    font-size: 2vh;
+    color: rgb(223, 46, 46);
+    margin-bottom: 0.5vh;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 400px;
+    font-weight: bold;
+}
+
+.file-progress {
+    font-size: 1.8vh;
+    color: rgba(255, 255, 255, 0.9);
+    font-family: monospace;
+}
+
+.files-counter {
+    font-size: 1.8vh;
+    color: rgba(223, 46, 46, 0.9);
+    letter-spacing: 1px;
+    margin: 1vh 0;
+    padding: 0.5vh;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 5px;
+}
+
+.loading-additional {
+    font-size: 1.8vh;
+    color: #4CAF50;
+    margin-top: 1vh;
+    padding: 0.5vh;
+    border-radius: 5px;
+    background: rgba(76, 175, 80, 0.1);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+    transition: opacity 0.3s ease;
+    text-align: center;
 }
 
 #player-count {
@@ -164,10 +259,21 @@ canvas {
     }
     
     .loading-container {
-        width: 80%;
+        width: 90%;
+        min-width: auto;
+        padding: 2vh;
     }
     
     #text_tips {
         font-size: 2.2vh;
+    }
+    
+    .file-name {
+        max-width: 250px;
+        font-size: 1.8vh;
+    }
+    
+    .file-progress, .files-counter, .loading-stage {
+        font-size: 1.6vh;
     }
 }
