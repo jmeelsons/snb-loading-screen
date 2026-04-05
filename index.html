@@ -2,348 +2,214 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link href="https://fonts.googleapis.com/css?family=Ubuntu|Ubuntu+Condensed|Ubuntu+Mono&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/main.css">
-    <title>SNUFF EXPIE...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>SNB-RU Loading Screen</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Comic Sans MS', 'Comic Sans', 'Chalkboard SE', 'Segoe UI Emoji', cursive, sans-serif;
+            background: #0a0a0a;
+        }
+        .slideshow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            filter: none;
+            transform: none;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0;
+            animation: fadeSoft 24s infinite ease-in-out;
+            will-change: opacity;
+        }
+
+        .slide:nth-child(1) {
+            animation-delay: 0s;
+            background-image: url('images/1.jpg');
+        }
+        .slide:nth-child(2) {
+            animation-delay: 8s;
+            background-image: url('images/2.jpg');
+        }
+        .slide:nth-child(3) {
+            animation-delay: 16s;
+            background-image: url('images/3.jpg');
+        }   
+        .slide:nth-child(4) {
+            animation-delay: 24s;
+            background-image: url('images/4.jpg');     
+        }   
+        .slide:nth-child(5) {
+            animation-delay: 32s;
+            background-image: url('images/5.gif');     
+        }
+        .slide:nth-child(6) {
+            animation-delay: 40s;
+            background-image: url('images/6.gif');     
+        }        
+
+        @keyframes fadeSoft {
+            0% { opacity: 0; }
+            6% { opacity: 1; }  
+            28% { opacity: 1; }   
+            36% { opacity: 0; }    
+            100% { opacity: 0; }
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 182, 193, 0.25) 0%, rgba(255, 240, 245, 0.15) 100%);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .content {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3;
+            text-align: center;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            pointer-events: none;
+        }
+
+        .fade-in-text {
+            font-size: 4.5vw;
+            font-weight: bold;
+            letter-spacing: 5px;
+            animation: appearGlow 3.2s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
+            opacity: 0;
+            color: white;
+            text-shadow: 
+                0 0 12px #ffb6c1,
+                0 0 25px #ffb6c1,
+                0 0 40px #ff69b4,
+                0 0 55px #ff69b4,
+                0 0 70px #ff1493;
+            background-color: rgba(255, 240, 245, 0.2);
+            padding: 20px 50px;
+            border-radius: 100px;
+            border: 2px solid rgba(255, 210, 220, 0.9);
+            box-shadow: 
+                0 0 25px rgba(255, 105, 180, 0.5),
+                0 0 50px rgba(255, 20, 147, 0.3);
+            backdrop-filter: none;
+            display: inline-block;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+
+        @keyframes appearGlow {
+            0% {
+                opacity: 0;
+                transform: scale(0.7);
+                text-shadow: 0 0 0 transparent;
+                letter-spacing: 12px;
+            }
+            35% {
+                opacity: 0.95;
+                transform: scale(1.05);
+                text-shadow: 
+                    0 0 25px #ffb6c1,
+                    0 0 50px #ff69b4,
+                    0 0 75px #ff1493;
+                letter-spacing: 6px;
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+                text-shadow: 
+                    0 0 12px #ffb6c1,
+                    0 0 28px #ffb6c1,
+                    0 0 42px #ff69b4,
+                    0 0 56px #ff69b4,
+                    0 0 68px #ff1493;
+                letter-spacing: 5px;
+            }
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 35%, rgba(255, 220, 230, 0.2) 0%, transparent 35%),
+                        radial-gradient(circle at 80% 70%, rgba(255, 182, 193, 0.2) 0%, transparent 40%),
+                        radial-gradient(circle at 95% 15%, rgba(255, 120, 160, 0.12) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 4;
+        }
+
+        @media (max-width: 680px) {
+            .fade-in-text {
+                font-size: 8vw;
+                padding: 14px 30px;
+                letter-spacing: 3px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .slide {
+                animation: none;
+                opacity: 0;
+            }
+            .slide:first-child {
+                opacity: 1;
+            }
+            .fade-in-text {
+                animation: none;
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
 </head>
 <body>
-    <canvas id="grid"></canvas>
-    <div class="gradient"></div>
-    <div class="background"></div>
-    <div class="overhaul"></div>
 
-    <nav>
-        <div id="announcement"></div>
-        <span id="map">You're playing on </span>
-        <span id="steamid"></span>
-    </nav>
+    <div class="slideshow">
+        <div class="slide"></div>
+        <div class="slide"></div>
+        <div class="slide"></div>
+        <div class="slide"></div>
+        <div class="slide"></div>
+        <div class="slide"></div>
+    </div>
 
-    <div id="debug"></div>
+    <div class="overlay"></div>
 
-    <main>
-        <div class="title">
-            <h2>Welcome to,</h2>
-            <h1 id="title"></h1>
-            <div id="history"></div>
-        </div>
-        <div class="under-nav"></div>
-        <div class="loading-box"></div>
-    </main>
-
-    <div class="centertext">
-        <span class="text_1"></span>
-        <span class="text_1" style="color:white;"></span>
-        
-        <div style="margin-top: -2vh;">
-            <span class="info" id="server-name">Loading to SNB-RU...</span>
-            <br>
-            <span class="info" id="map-name"></span>
-            <br>
-            <div class="loading-container">
-                <span class="info" id="loading-status">Connecting to server</span>
-                <div class="loading-bar">
-                    <div class="loading-progress" id="loading-progress"></div>
-                </div>
-            </div>
-            
-            <!-- Добавлен контейнер для отображения загружаемых файлов -->
-            <div class="files-container">
-                <div class="files-header">
-                    <span class="files-title">Downloading files:</span>
-                    <span class="files-count" id="files-count">0/0</span>
-                </div>
-                <div class="files-list" id="files-list">
-                    <!-- Сюда будут добавляться загружаемые файлы -->
-                </div>
-            </div>
-            
-            <br>
-            <span id="text_tips" tip>Hey where tips?</span>
-        </div>
+    <div class="content">
+        <div class="fade-in-text">SNB-RU Z-SANDBOX</div>
     </div>
     
-    <div class="info-down">
-        discord.gg/ccVa3Mbk
-    </div>
-
-    <script src="js/lib/jquery-3.4.1.min.js"></script>
-    <script src="js/config.js"></script>
-    <script src="js/main.js"></script>
-    <script>
-        const canvas = document.getElementById('grid');
-        const ctx = canvas.getContext('2d');
-        
-        canvas.width = window.innerWidth + 25;
-        canvas.height = window.innerHeight + 25;
-        
-        const gridSize = 60;
-        let offsetX = window.innerWidth / 2;
-        let offsetY = -window.innerHeight / 2;
-        const gridColor = 'rgba(223, 46, 46, 0.08)';
-        
-        function drawGrid() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            for (let x = offsetX % gridSize; x < canvas.width + gridSize; x += gridSize) {
-                ctx.beginPath();
-                ctx.moveTo(x, 0);
-                ctx.lineTo(x, canvas.height);
-                ctx.strokeStyle = gridColor;
-                ctx.lineWidth = 1.5;
-                ctx.stroke();
-            }
-
-            for (let y = offsetY % gridSize; y < canvas.height + gridSize; y += gridSize) {
-                ctx.beginPath();
-                ctx.moveTo(0, y);
-                ctx.lineTo(canvas.height, y);
-                ctx.strokeStyle = gridColor;
-                ctx.lineWidth = 1.5;
-                ctx.stroke();
-            }
-
-            offsetX -= 0.15;
-            offsetY += 0.15;
-
-            requestAnimationFrame(drawGrid);
-        }
-
-        drawGrid();
-
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth + 25;
-            canvas.height = window.innerHeight + 25;
-        });
-
-        // Loading tips system
-        var currentLang = navigator.language;
-        let tipInterval;
-        let loadingProgress = 0;
-        
-        function SelectTip() {
-            const newLang = (currentLang === 'ru-RU' || currentLang === 'ru') ? 'ru' : 'en';
-
-            fetch(`tips/${newLang}.json`)
-                .then(response => response.json())
-                .then(translationData => {
-                    const tips = document.querySelectorAll('[tip]');
-                    tips.forEach(element => {
-                        var keys = Object.keys(translationData);
-                        const key = keys[Math.floor(Math.random() * keys.length)];
-                        if (translationData[key]) {
-                            element.textContent = translationData[key];
-                        }
-                    });   
-                })
-                .catch(error => {
-                    console.error('Error loading tips:', error);
-                    document.getElementById('text_tips').textContent = 'Welcome to SNB-RU Servers!';
-                });
-        }
-
-        const changingText = document.getElementById('text_tips');
-        
-        function changeText() {
-            changingText.style.opacity = 0;
-            changingText.addEventListener('transitionend', function handleTransition() {
-                changingText.style.opacity = 1;
-                SelectTip();
-                changingText.removeEventListener('transitionend', handleTransition);
-            }, { once: true });
-        }
-
-        function startTipRotation() {
-            changeText();
-            if (tipInterval) clearInterval(tipInterval);
-            tipInterval = setInterval(changeText, 10000);
-        }
-
-        // Функции для отображения загружаемых файлов
-        let totalFiles = 0;
-        let downloadedFiles = 0;
-        const maxHistoryItems = 8;
-
-        function updateFilesCount() {
-            const countElement = document.getElementById('files-count');
-            if (countElement) {
-                countElement.textContent = `${downloadedFiles}/${totalFiles}`;
-            }
-        }
-
-        function addFileToList(filename, isStatus = false) {
-            const filesList = document.getElementById('files-list');
-            if (!filesList) return;
-
-            // Создаем элемент для файла/статуса
-            const item = document.createElement('div');
-            item.className = isStatus ? 'files-status-item' : 'files-item';
-            
-            // Добавляем иконку в зависимости от типа
-            const icon = isStatus ? '' : '';
-            
-            // Ограничиваем длину имени файла
-            let displayName = filename;
-            if (displayName.length > 40) {
-                displayName = displayName.substring(0, 37) + '...';
-            }
-            
-            item.innerHTML = `<span class="files-icon">${icon}</span> <span class="files-name">${displayName}</span>`;
-            
-            // Добавляем в начало списка
-            filesList.prepend(item);
-            
-            // Ограничиваем количество элементов в списке
-            const items = filesList.children;
-            while (items.length > maxHistoryItems) {
-                items[items.length - 1].remove();
-            }
-            
-            // Анимация появления
-            setTimeout(() => {
-                item.style.opacity = '1';
-                item.style.transform = 'translateX(0)';
-            }, 10);
-            
-            // Обновляем прозрачность старых элементов
-            Array.from(items).forEach((el, index) => {
-                if (index > 0) {
-                    el.style.opacity = Math.max(0.3, 1 - index * 0.15).toString();
-                }
-            });
-        }
-
-        // Переопределяем функции из main.js для интеграции
-        const originalSetFilesTotal = window.SetFilesTotal;
-        window.SetFilesTotal = function(total) {
-            totalFiles = total;
-            downloadedFiles = 0;
-            updateFilesCount();
-            
-            // Очищаем список файлов при новой загрузке
-            const filesList = document.getElementById('files-list');
-            if (filesList) {
-                filesList.innerHTML = '';
-            }
-            
-            if (originalSetFilesTotal) {
-                originalSetFilesTotal(total);
-            }
-        };
-
-        const originalSetFilesNeeded = window.SetFilesNeeded;
-        window.SetFilesNeeded = function(needed) {
-            if (totalFiles > 0) {
-                downloadedFiles = totalFiles - needed;
-                updateFilesCount();
-            }
-            
-            if (originalSetFilesNeeded) {
-                originalSetFilesNeeded(needed);
-            }
-        };
-
-        const originalDownloadingFile = window.DownloadingFile;
-        window.DownloadingFile = function(filename) {
-            // Очищаем имя файла от лишних символов
-            const cleanFilename = filename.replace(/'/g, '').replace(/\?/g, '');
-            
-            // Извлекаем только имя файла из полного пути
-            const shortName = cleanFilename.split('/').pop() || cleanFilename;
-            
-            addFileToList(shortName, false);
-            
-            if (originalDownloadingFile) {
-                originalDownloadingFile(filename);
-            }
-        };
-
-        const originalSetStatusChanged = window.SetStatusChanged;
-        window.SetStatusChanged = function(status) {
-            addFileToList(status, true);
-            
-            // Обновляем статус загрузки
-            const statusElement = document.getElementById('loading-status');
-            if (statusElement) {
-                if (status === 'Workshop Complete') {
-                    statusElement.textContent = 'Workshop files loaded';
-                } else if (status === 'Client info sent!') {
-                    statusElement.textContent = 'Connecting to server...';
-                } else if (status === 'Starting Lua...') {
-                    statusElement.textContent = 'Starting game...';
-                } else if (status.length < 30) {
-                    statusElement.textContent = status;
-                }
-            }
-            
-            if (originalSetStatusChanged) {
-                originalSetStatusChanged(status);
-            }
-        };
-
-        // GMod integration
-        function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode, volume, language) {
-            // Parse server name
-            const nameParts = servername.split("|");
-            if (nameParts.length > 2) {
-                document.getElementById('server-name').textContent = nameParts[2].trim();
-            } else {
-                document.getElementById('server-name').textContent = servername;
-            }
-            
-            // Set map name
-            document.getElementById('map-name').textContent = mapname ? 
-                '' + mapname.replace('gm_', '').replace(/_/g, ' ') : '';
-            
-            // Set language
-            if (language) {
-                currentLang = language;
-            }
-            
-            // Initial tip
-            SelectTip();
-            startTipRotation();
-
-            // Call original GameDetails
-            if (window.originalGameDetails) {
-                window.originalGameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode);
-            }
-        }
-
-        function onUpdatePlayerCount(players) {
-            const maxPlayers = document.getElementById('server-name').textContent.includes('ZCity') ? 64 : 32;
-            const playerCountElement = document.getElementById('player-count');
-            if (playerCountElement) {
-                playerCountElement.textContent = players + '/' + maxPlayers;
-            }
-        }
-
-        function LoadingProgress(progress) {
-            loadingProgress = Math.min(progress * 100, 100);
-            const progressBar = document.getElementById('loading-progress');
-            if (progressBar) {
-                progressBar.style.width = loadingProgress + '%';
-            }
-            
-            if (loadingProgress >= 100) {
-                document.getElementById('loading-status').textContent = 'Starting game...';
-            }
-        }
-
-        // Store original GameDetails
-        window.originalGameDetails = window.GameDetails;
-        // Переопределяем глобальную функцию GameDetails
-        window.GameDetails = GameDetails;
-
-        // Initialize
-        setTimeout(() => {
-            SelectTip();
-            startTipRotation();
-            
-            // Инициализируем счетчик файлов
-            updateFilesCount();
-        }, 500);
-    </script>
 </body>
 </html>
