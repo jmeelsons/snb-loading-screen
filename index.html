@@ -217,7 +217,6 @@
             100% { opacity: 1; transform: translateY(0); }
         }
 
-        /* адаптив */
         @media (max-width: 680px) {
             .fade-in-text {
                 font-size: 8vw;
@@ -289,6 +288,8 @@
             const audio = new Audio();
             const trackDisplay = document.getElementById('trackDisplay');
             let isUserInteracted = false;
+
+            audio.volume = 0.2;
 
             function updateTrackLabel(label, isLoading) {
                 if (isLoading) {
